@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  game-discovery-service:
+    image: game-discovery-service:0.0.1-SNAPSHOT
+    ports:
+      - "8761:8761"
+    networks:
+      - game-network
+    environment:
+      eureka.instance.hostname: game-discovery-service
+      eureka.client.serviceUrl.defaultZone: http://game-discovery-service:8761/eureka/
+
+  game-client-service:
+    image: game-client-service:0.0.1-SNAPSHOT
+    ports:
+      - "8100:8100"
+    depends_on:
+      - game-discovery-service
+    environment:
+      eureka.client.serviceUrl.defaultZone: http://game-discovery-service:8761/eureka/
+    networks:
+      - game-network
+
+  game-catalogue-service:
+    image: scorsaro/game-catalogue-service:0.0.1
+    ports:
+      - "8200:8200"
+    depends_on:
+      - game-discovery-service
+    environment:
+      eureka.client.serviceUrl.defaultZone: http://game-discovery-service:8761/eureka/
+    networks:
+      - game-network
+
+networks:
+  game-network:
